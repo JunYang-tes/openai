@@ -389,7 +389,11 @@ abstract class OpenAINetworkingClient {
                 Map<String, dynamic> decodedData = {};
                 try {
                   decodedData = decodeToMap(respondData);
-                } catch (error) {/** ignore, data has not been received */}
+                } catch (error) {
+                  final statusCode = respond.statusCode;
+                  final exception = RequestFailedException(error.toString(), statusCode);
+                  yield* Stream<T>.error(exception);
+                }
 
                 if (doesErrorExists(decodedData)) {
                   final error = decodedData[OpenAIStrings.errorFieldKey]
